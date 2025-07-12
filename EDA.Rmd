@@ -1,0 +1,267 @@
+---
+title: "EDA"
+output: html_document
+date: "2025-07-12"
+---
+
+### iPhones from eBay
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+
+iphones = read.csv("iphone_cleaned.csv")
+#head(iphones)
+#str(iphones)
+summary(iphones)
+```
+
+```{r}
+ggplot(iphones) +
+  geom_histogram(aes(price.value), color="white", fill="orchid4", bins=15) + 
+  facet_wrap(~category_name) + 
+  theme_minimal() + 
+  labs(x = "Item Price", title = "Frequency of Items by Category - Search Term: IPhone 16", y = "Count")
+
+ggsave("histograms.png", bg="white")
+```
+
+```{r}
+iphones_only = iphones %>%
+                filter(category_id=="9355")
+
+iphones_only$condition_desc = paste(iphones_only$conditionId, "-", iphones_only$condition)
+
+str(iphones_only)
+
+ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
+  geom_histogram(alpha = 0.5, position = "identity", bins = 15) +
+  theme_minimal() + 
+  labs(title = "Histogram of Phones by Condition", x = "Price", y = "Count")
+
+ggsave("hist_cond.png", bg="white")
+
+```
+
+
+```{r}
+iphones_only = iphones_only %>%
+                filter(iphones_only$price.value > 200)
+
+# iphones_only %>%
+#   sort_by(iphones_only$price.value)
+
+ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
+  geom_histogram(alpha = 0.5, position = "identity", bins = 15) +
+  theme_minimal()
+```
+```{r}
+
+iphones_only$discount_flag = !is.na(iphones_only$marketingPrice.discountPercentage) & 
+                                    iphones_only$marketingPrice.discountPercentage != ""
+
+iphones_only$model_number = as.factor(iphones_only$model_number)
+
+ggplot(iphones_only, aes(x = days_listed, y = price.value)) +
+  geom_point(aes(color = discount_flag, shape = model_number)) +
+  scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "red")) +
+  theme_minimal() +
+  labs(x = "Days Listed", y = "Price", title = "Prices by Days Listed with Model") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("items_by_days.png", bg="white")
+```
+
+```{r}
+ggplot(iphones_only) + 
+  geom_boxplot(mapping = aes(x = model_number, y = price.value, fill = model_number)) + 
+  theme_minimal() +
+  labs(x = "Model Number", y = "Price", title = "Price by Model") +
+  theme(legend.position="none")
+```
+
+
+
+
+```{r}
+
+lmod = lm(price.value ~ condition + model_number, data = iphones_only)
+#summary(lmod)
+
+avg_prices <- iphones_only %>%
+  group_by(condition_desc) %>%
+  summarize(mean_price = mean(price.value, na.rm = TRUE))
+
+ggplot(iphones_only, aes(x = condition_desc, y = price.value, color = condition_desc)) +
+  geom_jitter(width = 0.2, alpha = 0.5, color = "black") +  # individual points
+  stat_summary(fun = mean, geom = "crossbar", width = 0.7, size = 1.5) +  # bold average line
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(x = "Condition", y = "Price", title = "Prices by Condition with Average Price") +
+  theme(legend.position="none")
+
+ggsave("price_by_cond.png", bg="white")
+
+```
+
+```{r}
+iphones_only = iphones_only %>%
+                filter(iphones_only$days_listed < 1000)
+
+ggplot(iphones_only, aes(x = days_listed, y = price.value, color = condition_desc)) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5)) +
+  labs(x = "Days Listed", y = "Price", title = "Prices by Days Listed with Condition") +
+  geom_smooth(aes(group=1), method="lm", color="grey40", se=FALSE)
+
+ggsave("prices_bydays.png", bg="white")
+
+```
+
+
+## Soccer Jerseys from eBay
+
+```{r}
+jerseys = read.csv("soccer_jerseys.csv")
+jerseys$condition_desc = paste(jerseys$conditionId, "-", jerseys$condition)
+str(jerseys)
+```
+
+```{r}
+ggplot(jerseys) + 
+  geom_bar(aes(category_name), fill = "darkorange", color = "white") + 
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.3)) 
+```
+
+
+```{r}
+jerseys$top_club = jerseys$club != ""
+#head(jerseys)
+
+club_jerseys = jerseys %>%
+                filter(category_id == 2887)
+
+ggplot(club_jerseys) + 
+  geom_boxplot(aes(x=top_club, y=price.value, color=top_club)) + 
+  theme_minimal() + 
+  labs(title="Price for Top Clubs", x = "Top Clubs", y = "Price") + 
+  theme(legend.position = "none")
+
+ggsave("top_clubs.png", bg="white")
+
+```
+
+### Microwaves from Amazon
+
+```{r}
+microwaves = read.csv("microwaves.csv")
+microwaves$price_list_price = as.numeric(gsub("\\$", "", microwaves$price_list_price))
+microwaves$price_name = as.factor(microwaves$price_name)
+microwaves$sponsored = as.factor(microwaves$sponsored)
+microwaves$is_small_business = as.factor(microwaves$is_small_business)
+microwaves$stock_info = as.factor(microwaves$stock_info)
+microwaves$is_prime = as.factor(microwaves$is_prime)
+str(microwaves)
+```
+
+```{r}
+
+ggplot(microwaves) + 
+  geom_boxplot(aes(x=sponsored, y = recent_sales_num, color = sponsored)) + 
+  theme_minimal() + 
+  theme(legend.position = "none") + 
+  labs(x="Sponsored", y = "Recent Sales", title = "Recent sales by Sponsored Items")
+
+ggsave("recent_spon.png", bg="white")
+
+```
+```{r}
+
+ggplot(microwaves) + 
+  geom_point(aes(x=ratings_total, y=recent_sales_num)) + 
+  theme_minimal() + 
+  labs(x="Ratings (total)", y="Recent Sales", title="Recent Sales by Ratings total")
+
+ggsave("sales_by_rat.png", bg="white")
+
+```
+
+### Lego from Amazon
+
+```{r}
+lego = read.csv("lego.csv")
+lego$price_list_price = as.numeric(gsub("\\$", "", lego$price_list_price))
+lego$price_name = as.factor(lego$price_name)
+lego$sponsored = as.factor(lego$sponsored)
+lego$stock_info = as.factor(lego$stock_info)
+lego$is_prime = as.factor(lego$is_prime)
+lego$age_rec = as.factor(lego$age_rec)
+lego$lego_theme = as.factor(lego$lego_theme)
+str(lego)
+```
+
+```{r}
+ggplot(lego) + 
+  geom_bar(aes(x=lego_theme), fill = "darkblue", color = "white") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) 
+
+```
+
+```{r}
+ggplot(lego) +
+  geom_histogram(aes(x=price_value), color="white", fill = "darkblue") +
+  theme_minimal()
+```
+
+### Summary 
+
+```{r}
+library(kableExtra)
+mean_iphone = mean(iphones_only$price.value)
+med_iphone = median(iphones_only$price.value)
+len_iphone = nrow(iphones_only)
+mean_soccer = mean(jerseys$price.value)
+med_soccer = median(jerseys$price.value)
+len_soccer = nrow(jerseys)
+mean_microwaves = mean(microwaves$price_value)
+med_microwaves = median(microwaves$price_value)
+len_microwaves = nrow(microwaves)
+mean_lego = mean(lego$price_value)
+med_lego = median(lego$price_value)
+len_lego = nrow(lego)
+
+init_feat_iphone = c("Condition, Seller Feedback, Discount, Shipping Cost, Days Listed, Seller Count, Model No.")
+init_feat_soccer = c("Condition, Seller Feedback, Discount, Shipping Cost, Days Listed, Seller Count, Club, Country, Year")
+init_feat_micro = c("Product Ratings, Sponsored, Size, Recent Sales, Amt off List Price")
+init_feat_lego = c("Product Ratings, Sponsored, Theme, Age Rec, Recent Sales, Amt off List Price")
+
+summary_df <- data.frame(
+  category = c("iPhones", "Soccer Jerseys", "Microwaves", "LEGO"),
+  mean_price = c(mean_iphone, mean_soccer, mean_microwaves, mean_lego),
+  median_price = c(med_iphone, med_soccer, med_microwaves, med_lego),
+  n = c(len_iphone, len_soccer, len_microwaves, len_lego),
+  features = c(init_feat_iphone, init_feat_soccer, init_feat_micro, init_feat_lego)
+)
+#summary_df
+
+table = summary_df %>%
+    kbl(
+    caption = "Summary Statistics",
+    col.names = c("Category", "Mean Price", "Median Price", "No. of Obs.", "Potential Features"),
+    digits = 2
+  ) %>%
+  kable_styling(full_width = FALSE, position = "center")
+
+#install.packages("webshot2")
+library(webshot2)
+save_kable(table, file = "summary_table.png")
+
+```
+
+```{r}
+table
+```
+
