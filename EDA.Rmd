@@ -23,16 +23,15 @@ ggplot(iphones) +
   theme_minimal() + 
   labs(x = "Item Price", title = "Frequency of Items by Category - Search Term: IPhone 16", y = "Count")
 
-ggsave("histograms.png", bg="white")
+ggsave("images/histograms.png", bg="white")
 ```
 
 ```{r}
 iphones_only = iphones %>%
                 filter(category_id=="9355")
 
+#combine condition id and condition
 iphones_only$condition_desc = paste(iphones_only$conditionId, "-", iphones_only$condition)
-
-str(iphones_only)
 
 ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
   geom_histogram(alpha = 0.5, position = "identity", bins = 15) +
@@ -40,7 +39,6 @@ ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
   labs(title = "Histogram of Phones by Condition", x = "Price", y = "Count")
 
 ggsave("images/hist_cond.png", bg="white")
-
 ```
 
 
@@ -48,15 +46,11 @@ ggsave("images/hist_cond.png", bg="white")
 iphones_only = iphones_only %>%
                 filter(iphones_only$price.value > 200)
 
-# iphones_only %>%
-#   sort_by(iphones_only$price.value)
-
 ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
   geom_histogram(alpha = 0.5, position = "identity", bins = 15) +
   theme_minimal()
 ```
 ```{r}
-
 iphones_only$discount_flag = !is.na(iphones_only$marketingPrice.discountPercentage) & 
                                     iphones_only$marketingPrice.discountPercentage != ""
 
@@ -84,7 +78,6 @@ ggplot(iphones_only) +
 
 
 ```{r}
-
 lmod = lm(price.value ~ condition + model_number, data = iphones_only)
 #summary(lmod)
 
@@ -101,7 +94,6 @@ ggplot(iphones_only, aes(x = condition_desc, y = price.value, color = condition_
   theme(legend.position="none")
 
 ggsave("images/price_by_cond.png", bg="white")
-
 ```
 
 ```{r}
@@ -146,8 +138,6 @@ jerseys$top_club = jerseys$club != ""
 jerseys$top_country = jerseys$country != ""
 jerseys$from_usa = jerseys$itemLocation.country == "US"
 
-#head(jerseys)
-
 club_jerseys = jerseys %>%
                 filter(category_id == 2887)
 country_jerseys = jerseys %>%
@@ -174,31 +164,28 @@ p2 = ggplot(country_jerseys) +
 combined_plot = p1 + p2
 
 ggsave("images/top_clubs.png", combined_plot, bg="white", width = 14, height = 6, dpi = 300)
-
 ```
 
 ```{r}
-#str(jerseys)
 lmod_soccer = lm(price.value ~ condition + seller.feedbackPercentage + seller.feedbackScore + itemLocation.country +
                    category_id + shipping_cost + days_listed + top_club + country + year, data = jerseys)
 #summary(lmod_soccer)
 cat("AIC:", AIC(lmod_soccer), "\n")
 
-png("images/qqplot.png", width = 1400, height = 800)
+png("images/qqplot.png")
 QQ = plot(lmod_soccer, 2)
 dev.off()
-
 ```
 
 ```{r}
-jerseys$log_price = log(jerseys$price.value)
-jerseys_clean = na.omit(jerseys)
+jerseys$log_price = log(jerseys$price.value)  #add log-price column
+jerseys_clean = na.omit(jerseys)    #omit NA
 lm_log = lm(log_price ~ condition + seller.feedbackPercentage + 
              itemLocation.country + category_id + shipping_cost + top_club, data = jerseys_clean)
 #summary(lm_log)
 AIC(lm_log)
 
-png("images/qqplot_log_price.png", width = 1400, height = 800)
+png("images/qqplot_log_price.png")
 resids = resid(lm_log)
 qqnorm(resids, main = "Q-Q Plot using Log Price")
 qqline(resids, col = "darkblue", lwd = 1, lty = "dashed")
@@ -215,10 +202,7 @@ avPlots(lm_log)
 hist(jerseys$price.value)
 
 #install.packages("gamlss")
-library(gamlss)
-
-jerseys_clean = na.omit(jerseys)
-
+library(gamlss)     #for other distributions
 lmod_soccer2 = gamlss(price.value ~ condition + seller.feedbackPercentage + itemLocation.country + 
                         category_id + shipping_cost + top_club, data = jerseys_clean, family = "ST1")
 
@@ -228,7 +212,6 @@ cat("\n", "AIC: ", lmod_soccer2$aic, "\n")
 resids = residuals(lmod_soccer2, type = "simple")
 qqnorm(resids, main = "Q-Q Plot using Student Skew t distribution with gamlss")
 qqline(resids, col = "darkblue", lwd = 1, lty = "dashed")
-
 ```
 
 
@@ -246,7 +229,6 @@ str(microwaves)
 ```
 
 ```{r}
-
 ggplot(microwaves) + 
   geom_boxplot(aes(x=sponsored, y = recent_sales_num, color = sponsored)) + 
   theme_minimal() + 
@@ -254,7 +236,6 @@ ggplot(microwaves) +
   labs(x="Sponsored", y = "Recent Sales", title = "Recent sales by Sponsored Items")
 
 ggsave("images/recent_spon.png", bg="white")
-
 ```
 ```{r}
 
@@ -264,7 +245,6 @@ ggplot(microwaves) +
   labs(x="Ratings (total)", y="Recent Sales", title="Recent Sales by Ratings total")
 
 ggsave("images/sales_by_rat.png", bg="white")
-
 ```
 
 ### Lego from Amazon
@@ -286,7 +266,6 @@ ggplot(lego) +
   geom_bar(aes(x=lego_theme), fill = "darkblue", color = "white") + 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) 
-
 ```
 
 ```{r}
