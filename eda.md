@@ -1,7 +1,7 @@
 
 #### eBay API and Data Cleaning
 
-The full code for the API calls and initial data cleaning in Python discussed below is available here(LINK).
+The full code for the API calls and initial data cleaning in Python discussed below is available [here](https://github.com/blairAJones/ShoppingML/blob/main/API_datacleaning.ipynb).
 
 For the eBay data, an eBay developer account was created and production application keys were available.  Python was used to code the API call, using the requests and json modules.  After reviewing the ![eBay site](https://developer.ebay.com/develop/get-started/api-call-limits), it appeared that the Browse API was the option with the most information available to develop pricing / listing ML models.  This allowed for a keyword search, such as "iPhone 16" and "soccer jerseys." 
 
@@ -27,13 +27,15 @@ For the Amazon data, ![Rainforest API](https://app.rainforestapi.com/playground)
 
 ![Example API code](images/rainforest_api.png)
 
-The specific code allowed for a general search of products, such as microwaves and Lego, which were done separately and saved as .json files.  These were then converted to pandas dataframes and additional cleaning similar to the eBay data was performed. Some fields of interest are recent sales, sponsored items, list price (to calculate discounts), and ratings.  The goal is to see if these fields are sufficient to predict prices and identify "good deals" and competitive listings using various machine learning models.  The Rainforest API free tier is limited and thus additional searches may not be available without upgrading the account.  
+The specific code allowed for a general search of products, such as microwaves and Lego, which were done separately and saved as .json files.  These were then converted to pandas dataframes and additional cleaning similar to the eBay data was performed. Some fields of interest are recent sales, sponsored items, list price (to calculate discounts), and ratings.  The goal is to see if these fields are sufficient to predict prices and identify "good deals" and competitive listings using various machine learning models.  The Rainforest API free tier is limited and thus additional searches may not be available without upgrading the account.   
 
 #### Exploratory Data Analysis
 
-The full code and data files for the exploratory data analysis are available here(LINK).
+The full code and data files for the exploratory data analysis are available [here](https://github.com/blairAJones/ShoppingML/blob/main/EDA.Rmd).
 
 The inital data exploratory analysis was performed in R, using ggplot and tidyverse.  
+
+##### eBay
 
 First, the a simple iPhone data histogram was created.
 
@@ -47,7 +49,7 @@ A histogram of phones by price, further segemented by condition, was prepared.
 
 From this, it can be seen that a number of phones were less than $100, which appears abnormal.  Upon review of items' descriptions, these were accessories that were incorrectly given a category ID of "cell phone."  So, these items were removed from the data.  
 
-Then, a scatter plot of phones using price vs days listed was created, which an additional flag of "discount" used to highlight items that were marked down from their original price.
+Then, a scatter plot of phone listings using price vs. days listed was created, in which an additional flag of "discount" used to highlight items that were marked down from their original price.
 
 ![](images/items_by_days.png)
 
@@ -66,6 +68,19 @@ Condition and days listed could be of interest.
 For the soccer jerseys, similar EDA was performed.  Top clubs, e.g. Liverpool or Real Madrid, were identified by the user based on simple internet search (of course, there is some subjectivity with this).  From a simple box plot, it would appear that jerseys from top clubs do tend to be priced higher.  
 
 ![](/images/top_clubs.png)
+
+A multiple linear regression was created as a baseline; however, the plot summary showed significant issues with the normality assumption.
+
+![](/images/qqplot.png)
+
+To test, prices were converted to a log-scale and another model was created.  The QQ Plot showed a significant improvement over the non-transformed price.
+
+![](/images/qqplot_log_price.png)
+
+Once additional models are built, regular vs log price will be considered when running the test data.
+
+
+##### Amazon
 
 For the Amazon data, different fields are available, including ratings, sponsored (yes/no), and recent sales, although granular data for this isn't available (only 5K+ / 10K+, for example).  
 

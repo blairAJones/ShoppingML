@@ -10,7 +10,7 @@ date: "2025-07-12"
 library(ggplot2)
 library(tidyverse)
 
-iphones = read.csv("iphone_cleaned.csv")
+iphones = read.csv("data/iphone_cleaned.csv")
 #head(iphones)
 #str(iphones)
 summary(iphones)
@@ -39,7 +39,7 @@ ggplot(iphones_only, aes(x = price.value, fill = condition_desc)) +
   theme_minimal() + 
   labs(title = "Histogram of Phones by Condition", x = "Price", y = "Count")
 
-ggsave("hist_cond.png", bg="white")
+ggsave("images/hist_cond.png", bg="white")
 
 ```
 
@@ -69,7 +69,7 @@ ggplot(iphones_only, aes(x = days_listed, y = price.value)) +
   labs(x = "Days Listed", y = "Price", title = "Prices by Days Listed with Model") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave("items_by_days.png", bg="white")
+ggsave("images/items_by_days.png", bg="white")
 ```
 
 ```{r}
@@ -100,7 +100,7 @@ ggplot(iphones_only, aes(x = condition_desc, y = price.value, color = condition_
   labs(x = "Condition", y = "Price", title = "Prices by Condition with Average Price") +
   theme(legend.position="none")
 
-ggsave("price_by_cond.png", bg="white")
+ggsave("images/price_by_cond.png", bg="white")
 
 ```
 
@@ -115,7 +115,7 @@ ggplot(iphones_only, aes(x = days_listed, y = price.value, color = condition_des
   labs(x = "Days Listed", y = "Price", title = "Prices by Days Listed with Condition") +
   geom_smooth(aes(group=1), method="lm", color="grey40", se=FALSE)
 
-ggsave("prices_bydays.png", bg="white")
+ggsave("images/prices_bydays.png", bg="white")
 
 ```
 
@@ -123,14 +123,19 @@ ggsave("prices_bydays.png", bg="white")
 ## Soccer Jerseys from eBay
 
 ```{r}
-jerseys = read.csv("soccer_jerseys.csv")
+jerseys = read.csv("data/soccer_jerseys.csv")
 jerseys$condition_desc = paste(jerseys$conditionId, "-", jerseys$condition)
+jerseys$condition = as.factor(jerseys$condition)
+jerseys$itemLocation.country = as.factor(jerseys$itemLocation.country)
+jerseys$category_id = as.factor(jerseys$category_id)
+jerseys$club = as.factor(jerseys$club)
+jerseys$country = as.factor(jerseys$country)
 str(jerseys)
 ```
 
 ```{r}
 ggplot(jerseys) + 
-  geom_bar(aes(category_name), fill = "darkorange", color = "white") + 
+  geom_bar(aes(category_name), fill = "darkorange2", color = "white") + 
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.3)) 
 ```
@@ -138,25 +143,99 @@ ggplot(jerseys) +
 
 ```{r}
 jerseys$top_club = jerseys$club != ""
+jerseys$top_country = jerseys$country != ""
+jerseys$from_usa = jerseys$itemLocation.country == "US"
+
 #head(jerseys)
 
 club_jerseys = jerseys %>%
                 filter(category_id == 2887)
+country_jerseys = jerseys %>%
+                    filter(category_id == 2891)
 
-ggplot(club_jerseys) + 
-  geom_boxplot(aes(x=top_club, y=price.value, color=top_club)) + 
+library(patchwork)
+all_prices = c(club_jerseys$price.value, country_jerseys$price.value)
+y_min = min(all_prices, na.rm = TRUE)
+y_max = max(all_prices, na.rm = TRUE)
+p1 = ggplot(club_jerseys) + 
+  geom_boxplot(aes(x = top_club, y = price.value, color = top_club)) + 
   theme_minimal() + 
-  labs(title="Price for Top Clubs", x = "Top Clubs", y = "Price") + 
-  theme(legend.position = "none")
+  labs(title = "Price for Top Clubs (Club Jerseys Only)", x = "Top Clubs", y = "Price") + 
+  theme(legend.position = "none") + 
+  ylim(y_min, y_max)
 
-ggsave("top_clubs.png", bg="white")
+p2 = ggplot(country_jerseys) + 
+  geom_boxplot(aes(x = top_country, y = price.value, color = top_country)) + 
+  theme_minimal() + 
+  labs(title = "Price for Top Countries (National Team Jerseys Only)", x = "Top Countries", y = "Price") + 
+  theme(legend.position = "none") + 
+  ylim(y_min, y_max)
+
+combined_plot = p1 + p2
+
+ggsave("images/top_clubs.png", combined_plot, bg="white", width = 14, height = 6, dpi = 300)
 
 ```
+
+```{r}
+#str(jerseys)
+lmod_soccer = lm(price.value ~ condition + seller.feedbackPercentage + seller.feedbackScore + itemLocation.country +
+                   category_id + shipping_cost + days_listed + top_club + country + year, data = jerseys)
+#summary(lmod_soccer)
+cat("AIC:", AIC(lmod_soccer), "\n")
+
+png("images/qqplot.png", width = 1400, height = 800)
+QQ = plot(lmod_soccer, 2)
+dev.off()
+
+```
+
+```{r}
+jerseys$log_price = log(jerseys$price.value)
+jerseys_clean = na.omit(jerseys)
+lm_log = lm(log_price ~ condition + seller.feedbackPercentage + 
+             itemLocation.country + category_id + shipping_cost + top_club, data = jerseys_clean)
+#summary(lm_log)
+AIC(lm_log)
+
+png("images/qqplot_log_price.png", width = 1400, height = 800)
+resids = resid(lm_log)
+qqnorm(resids, main = "Q-Q Plot using Log Price")
+qqline(resids, col = "darkblue", lwd = 1, lty = "dashed")
+dev.off()
+```
+
+```{r}
+library(car)
+avPlots(lm_log)
+```
+
+
+```{r}
+hist(jerseys$price.value)
+
+#install.packages("gamlss")
+library(gamlss)
+
+jerseys_clean = na.omit(jerseys)
+
+lmod_soccer2 = gamlss(price.value ~ condition + seller.feedbackPercentage + itemLocation.country + 
+                        category_id + shipping_cost + top_club, data = jerseys_clean, family = "ST1")
+
+plot(lmod_soccer2)
+cat("\n", "AIC: ", lmod_soccer2$aic, "\n")
+
+resids = residuals(lmod_soccer2, type = "simple")
+qqnorm(resids, main = "Q-Q Plot using Student Skew t distribution with gamlss")
+qqline(resids, col = "darkblue", lwd = 1, lty = "dashed")
+
+```
+
 
 ### Microwaves from Amazon
 
 ```{r}
-microwaves = read.csv("microwaves.csv")
+microwaves = read.csv("data/microwaves.csv")
 microwaves$price_list_price = as.numeric(gsub("\\$", "", microwaves$price_list_price))
 microwaves$price_name = as.factor(microwaves$price_name)
 microwaves$sponsored = as.factor(microwaves$sponsored)
@@ -174,7 +253,7 @@ ggplot(microwaves) +
   theme(legend.position = "none") + 
   labs(x="Sponsored", y = "Recent Sales", title = "Recent sales by Sponsored Items")
 
-ggsave("recent_spon.png", bg="white")
+ggsave("images/recent_spon.png", bg="white")
 
 ```
 ```{r}
@@ -184,14 +263,14 @@ ggplot(microwaves) +
   theme_minimal() + 
   labs(x="Ratings (total)", y="Recent Sales", title="Recent Sales by Ratings total")
 
-ggsave("sales_by_rat.png", bg="white")
+ggsave("images/sales_by_rat.png", bg="white")
 
 ```
 
 ### Lego from Amazon
 
 ```{r}
-lego = read.csv("lego.csv")
+lego = read.csv("data/lego.csv")
 lego$price_list_price = as.numeric(gsub("\\$", "", lego$price_list_price))
 lego$price_name = as.factor(lego$price_name)
 lego$sponsored = as.factor(lego$sponsored)
@@ -257,7 +336,7 @@ table = summary_df %>%
 
 #install.packages("webshot2")
 library(webshot2)
-save_kable(table, file = "summary_table.png")
+save_kable(table, file = "images/summary_table.png")
 
 ```
 

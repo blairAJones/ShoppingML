@@ -16,11 +16,11 @@ The project plans to work with the available retail data and answer the followin
 
 - Can item prices be accurately predicted based on current listings, including information like days-on-hand, markdowns, seller/product ratings, recent sales (Amazon)?
 - Which features are most significant in these predictions?
-- Do these models vary based on item type?  For example, iPhone 16 vs soccer jerseys where there is some differention with phone model types but lots of similar listings, compared with soccer jerseys which are highly specific.  
+- Do these models vary based on item type?  For example, iPhone 16 vs soccer jerseys, where there is some differention with phone model types but lots of similar listings, compared with soccer jerseys which are highly specific.  
 - Do prices follow a normal distribution, or would a log transformation be prudent?  Or possibly modeling based on another distribution, like using Poission for recent sales counts, for example.  
 - Can a machine learning model help determine which items or listings are competitively priced or overpriced, compared to others?
 - On eBay, do longer titles and more pictures indicate a higher quality listing?
 - Are there differences in feature significance with seller ratings on eBay compared with product ratings on Amazon?
 - Will tree-based models peform better on this data given the number of qualitative features?
 - How could a recommender system and / or sentiment analysis of reviews be incorporated into future versions of the model?
-- (Likely for future analysis) Have the announcements for recent tariffs caused preemptive or necessary increases in prices for home goods (microwaves)?  Answering this would require gaining access to another API service which tracks historical Amazon prices.   
+- (Likely for future analysis) Have the announcements for recent tariffs caused preemptive or necessary increases in prices for home goods (e.g. microwaves)?  Answering this would require gaining access to another API service which tracks historical Amazon prices.   
