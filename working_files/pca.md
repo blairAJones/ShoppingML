@@ -1,8 +1,18 @@
 ### Overview
 Principal components analysis is a technique of reducing dimensionality by linear transformation.  The outputs of this analysis are called principal components which are new features that have been created from linear combinations of the originals.  The first principal component (PC1) is derived as a combination of the features which capture the maximum variance. PCA is way to reduce dimension for large-dimensional datasets and allows the user to visualize the data in 2D space by plotting PC1 / PC2.  
 
+PCA uses concepts from linear algebra.  Eigenvectors of the matrix $A^TA$ (similar to the covariance matrix) are directions in which the principal components point.  The corresponding eigenvalues describe the variance amount that each component explains.  If the first k components explain a sufficient amount of variance, then it is possible to reduce the dimension of the dataset by truncating by a limited number of PCs.  
+
+![Example PCA plot plot with synthetic data](/images/2/pca_ex.png)
+
+PCA is also helping for plotting in 2D as long as the first two PCs explain enough of the data.
+
+![Example Scree plot with synthetic data](/images/2/scree_ex.png)
+
+A scree plot is commonly used to visualize explained variance by component and to select a potential place to truncate the dimension (e.g. if the first two PCs explain 80%+, that may be sufficient.)
+
 ### Data
-Principal Component Analysis (PCA) then completed on the eBay soccer jerseys data as well as the Amazon Lego data.    
+Principal Component Analysis (PCA) was completed on the eBay soccer jerseys data as well as the Amazon Lego data.    
 
 Because PCA uses variance / covariance data to create the linear combinations, only numerical features are considered.
 
@@ -19,7 +29,7 @@ The full code for the PCA analysis is found here____.
 
 
 ### Results
-The data used in this project is not considered high-dimensional; there are ____ numerical features for the eBay data and ____ for the Amazon data.  However, PCA is needed for visualizing clusters in 2D, as well as identifying latent trends.  
+The data used in this project is not considered high-dimensional; there are seven numerical features for the eBay data and five for the Amazon data.  However, PCA is needed for visualizing clusters in 2D, as well as identifying latent trends.  
 
 #### eBay Soccer Jerseys
 The following are the loadings from the soccer data:
@@ -31,8 +41,6 @@ The loadings represent how much the original features factor into the new princi
 ![](/images/2/scree_soccer.png)
 
 The scree plot shows that it takes five principal components to explain 80% of the variance in the data.  Because the original data had only numerical 7 features, this is not a meaningful reduction to dimension. 
-
-
 
 #### Amazon Lego
 The following are the loadings from the Lego data:
@@ -48,7 +56,6 @@ The scree and cumulative variance plots show that it takes three PCs to obtain 8
 ![](/images/2/proj_lego.png)
 
 The projection of the data in PC1 and 2 was plotted with a color gradient from the original feature recent sales, as this feature was moderately positive in PC1 (left-right direction) and moderately negative in PC2 (up-down direction).
-
 
 ![](/images/2/biplot_lego.png)
 

@@ -1,0 +1,116 @@
+<h3 id="overview">Overview</h3>
+<p>K-Means and hierarchical clustering are unsupervised machine learning
+techniques which group data together based on similarity metrics.
+K-Means uses a pre-specified number of clusters (k) while hierarchical
+clustering grows a hierarchy of clusters from the bottom-up. Both
+methods allow the user to identify underlying patterns in the data
+across multiple features and can assist with reducing the dimension of
+large datasets.</p>
+<figure>
+<img src="/images/2/kmeans_ex.png"
+alt="Example of K-Means using synthetic data" />
+<figcaption aria-hidden="true">Example of K-Means using synthetic
+data</figcaption>
+</figure>
+<figure>
+<img src="/images/2/hclust_ex.png"
+alt="Example of H-Clustering using synthetic data" />
+<figcaption aria-hidden="true">Example of H-Clustering using synthetic
+data</figcaption>
+</figure>
+<p>For this particular project, various quantitative features are
+analyzed via clustering to identify which items naturally cluster
+together and how their features are related. For example, on the eBay
+data, is there a relationship between the seller’s ratings and
+additional images posted on the listings? Or, the seller’s ratings and
+seller’s count of current listings?</p>
+<p><img src="/images/2/addimages_feedback.png" /></p>
+<p>For the Amazon data, of interest was the recent sales data and
+ratings scores and totals.</p>
+<p><img src="/images/2/recent_sales_rating.png" /></p>
+<p>Details are discussed below.</p>
+<h3 id="data">Data</h3>
+<p>The dataframes used from ___ here continue to be analyzed.</p>
+<p>For the eBay data, the numerical features used in this analysis were
+as follows:</p>
+<p><img src="/images/2/features_iphones.png" /></p>
+<p>The seller feedback score represents the count of feedback received
+and the percentage represents the proportion of positive feedback out of
+total.</p>
+<p>For the Amazon data, the numerical features used in this analysis
+were as follow:</p>
+<p><img src="/images/2/features_micro.png" /></p>
+<p>There are fewer quantitative features for this data and additional
+filtering needed to be completed as not all listings had a cubic feet
+(microwave size) description in the title.</p>
+<h3 id="code">Code</h3>
+<p>A link to the full code for this analysis is found ___here.</p>
+<h3 id="results">Results</h3>
+<h4 id="ebay-iphones-data">eBay iPhones Data</h4>
+<h5 id="k-means">K-Means</h5>
+<p>On the eBay iPhone data, a K-Means elbow plot was created to identify
+a choice for k number of clusters.</p>
+<p><img src="/images/2/elbow_iphone.png" /></p>
+<p>There is not a clear point in which the plot “bends”; although it
+does appear that around k=4 or 5, there is a decrease in the slope, but
+does seem to increase slightly again.</p>
+<p>Then, a silhouette plot was created to assist with the selection of
+k.</p>
+<p><img src="/images/2/silh_iphone.png" /></p>
+<p>Based on the peak at 4, which ______, k=4 was chosen for further
+analysis.</p>
+<p><img src="/images/2/kclust_sum.png" /></p>
+<p>The above cluster summary shows the counts and mean feature values by
+cluster number.</p>
+<p>To plot the full data using the cluster colors, the dimensions were
+reduced to two via PCA projection (see __ tab for additional information
+on PCA).</p>
+<p><img src="/images/2/kmeans_wPCA_micro.png" /></p>
+<p>Unfortunately, for this data, the reduction to two dimensions does
+not assist with the visualization of the clusters.</p>
+<p>Select features were plotted against each other to identify
+interesting patterns.</p>
+<p>One example was seller feedback vs. additional image count:</p>
+<p><img src="/images/2/feedback_vs_image_ct.png" /></p>
+<p>Animated clustering process:</p>
+<p><img src="/images/2/kmeans.gif" /></p>
+<h5 id="hierarchical">Hierarchical</h5>
+<p>For hierarchical clustering, one needs to consider a linkage method
+when building the clusters up. Some options include Ward, which
+minimizes the within cluster variances as they are built; complete,
+which considers the maximum distance between any pair of points within a
+cluster; and average, which considers the average distance of the points
+in a cluster. These use Euclidean distance to measure; another option
+would be to consider cosine similarity as the distance measure, along
+with a link function (note that Ward uses Euclidean only). So, Ward and
+Complete linkage with Euclidean distance along with Complete linkage and
+cosine similarity distance were chosen to create dendograms.</p>
+<p><img src="/images/2/dendogram_iphone.png" /></p>
+<p><img src="/images/2/hclust_counts.png" /></p>
+<p>Based on these, k=6 was selected with the complete linkage using
+cosine similarity distance, as it appears to have the most balanced
+clusters.</p>
+<p>These clusters were plotted via PCA projection.</p>
+<p><img src="/images/2/hclust_iphone.png" /></p>
+<h4 id="amazon-microwaves-data">Amazon Microwaves Data</h4>
+<h5 id="k-means-1">K-Means</h5>
+<p>The microwaves data from Amazon was selected to perform similar
+K-means clustering analysis. An elbow plot and silhouette plot were
+created to assist with the choice of k.</p>
+<p><img src="/images/2/elbow_micro.png" /></p>
+<p><img src="/images/2/silh_micro.png" /></p>
+<p>Based on both charts, k = 3 was selected for further analysis.</p>
+<p><img src="/images/2/kmeans_wPCA_micro.png" /></p>
+<p>The PCA projection shows some evidence of clusters, and the first two
+principal components contributed more explained variance (63%) compared
+with the iPhones data (50%).</p>
+<p>Two select features were plotted, cubic feet (size) vs. ratings
+totals, and achieved convergence within ___ iterations.</p>
+<p><img src="/images/2/cu_vs_ratingtotal.png" /></p>
+<p><img src="/images/2/kmeans_micro.gif" /></p>
+<h3 id="summary">Summary</h3>
+<p>Ultimately, clustering found some interesting connections but it
+remained difficult to identify clear clusters in this data. It is
+possible that the data is just not naturally clustered, or that the
+numerical features do not tell the whole story of of these datasets, and
+categorical feature analysis is required as well.</p>

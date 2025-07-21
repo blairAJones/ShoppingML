@@ -2,13 +2,19 @@
 
 K-Means and hierarchical clustering are unsupervised machine learning techniques which group data together based on similarity metrics.  K-Means uses a pre-specified number of clusters (k) while hierarchical clustering grows a hierarchy of clusters from the bottom-up.  Both methods allow the user to identify underlying patterns in the data across multiple features and can assist with reducing the dimension of large datasets.  
 
+![Example of K-Means using synthetic data](/images/2/kmeans_ex.png)
+
+
+![Example of H-Clustering using synthetic data](/images/2/hclust_ex.png)
+
+
 For this particular project, various quantitative features are analyzed via clustering to identify which items naturally cluster together and how their features are related.  For example, on the eBay data, is there a relationship between the seller's ratings and additional images posted on the listings?  Or, the seller's ratings and seller's count of current listings?  
 
-____pictures from the 2D
+![](/images/2/addimages_feedback.png)
 
 For the Amazon data, of interest was the recent sales data and ratings scores and totals.  
 
-____pictures from the 2D
+![](/images/2/recent_sales_rating.png)
 
 Details are discussed below.
 

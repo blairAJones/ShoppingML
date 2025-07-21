@@ -1,0 +1,93 @@
+<h3 id="overview">Overview</h3>
+<p>Principal components analysis is a technique of reducing
+dimensionality by linear transformation. The outputs of this analysis
+are called principal components which are new features that have been
+created from linear combinations of the originals. The first principal
+component (PC1) is derived as a combination of the features which
+capture the maximum variance. PCA is way to reduce dimension for
+large-dimensional datasets and allows the user to visualize the data in
+2D space by plotting PC1 / PC2.</p>
+<p>PCA uses concepts from linear algebra. Eigenvectors of the matrix
+<span
+class="math inline"><em>A</em><sup><em>T</em></sup><em>A</em></span>
+(similar to the covariance matrix) are directions in which the principal
+components point. The corresponding eigenvalues describe the variance
+amount that each component explains. If the first k components explain a
+sufficient amount of variance, then it is possible to reduce the
+dimension of the dataset by truncating by a limited number of PCs.</p>
+<figure>
+<img src="/images/2/pca_ex.png"
+alt="Example PCA plot plot with synthetic data" />
+<figcaption aria-hidden="true">Example PCA plot plot with synthetic
+data</figcaption>
+</figure>
+<p>PCA is also helping for plotting in 2D as long as the first two PCs
+explain enough of the data.</p>
+<figure>
+<img src="/images/2/scree_ex.png"
+alt="Example Scree plot with synthetic data" />
+<figcaption aria-hidden="true">Example Scree plot with synthetic
+data</figcaption>
+</figure>
+<p>A scree plot is commonly used to visualize explained variance by
+component and to select a potential place to truncate the dimension
+(e.g. if the first two PCs explain 80%+, that may be sufficient.)</p>
+<h3 id="data">Data</h3>
+<p>Principal Component Analysis (PCA) was completed on the eBay soccer
+jerseys data as well as the Amazon Lego data.</p>
+<p>Because PCA uses variance / covariance data to create the linear
+combinations, only numerical features are considered.</p>
+<p>The following numerical features were used:</p>
+<p><img src="/images/2/features_soccer.png" /></p>
+<p><img src="/images/2/features_lego.png" /></p>
+<p>Because the values are in different scales, the features are scaled
+in order to properly assess variance.</p>
+<h3 id="code">Code</h3>
+<p>The full code for the PCA analysis is found here____.</p>
+<h3 id="results">Results</h3>
+<p>The data used in this project is not considered high-dimensional;
+there are seven numerical features for the eBay data and five for the
+Amazon data. However, PCA is needed for visualizing clusters in 2D, as
+well as identifying latent trends.</p>
+<h4 id="ebay-soccer-jerseys">eBay Soccer Jerseys</h4>
+<p>The following are the loadings from the soccer data:</p>
+<p><img src="/images/2/loadings_soccer.png" /></p>
+<p>The loadings represent how much the original features factor into the
+new principal components. For example, PC1 is heavily influenced
+(positively) by title length and additional image count, which both
+point to a more detailed listed. PC2 shows strong positive influence
+from a higher seller item count compared with a strong negative
+influence from a seller feedback score (total sales with feedback), so
+this contrasts higher vs lower volume sellers. PC3 is driven by feedback
+percentage (proportion of positive feedback of total), which indicate a
+higher quality seller.</p>
+<p><img src="/images/2/scree_soccer.png" /></p>
+<p>The scree plot shows that it takes five principal components to
+explain 80% of the variance in the data. Because the original data had
+only numerical 7 features, this is not a meaningful reduction to
+dimension.</p>
+<h4 id="amazon-lego">Amazon Lego</h4>
+<p>The following are the loadings from the Lego data:</p>
+<p><img src="/images/2/loadings_lego.png" /></p>
+<p>PC1 appears to capture the connection with discounting and total
+ratings, whereas PC2 seems to capture discounts with negatively
+correlated recent sales, meaning items that are likely discounted to
+move. PC3 almost exclusively factors in the product rating.</p>
+<p><img src="/images/2/scree_lego.png" /></p>
+<p>The scree and cumulative variance plots show that it takes three PCs
+to obtain 80% of variance explained.</p>
+<p><img src="/images/2/proj_lego.png" /></p>
+<p>The projection of the data in PC1 and 2 was plotted with a color
+gradient from the original feature recent sales, as this feature was
+moderately positive in PC1 (left-right direction) and moderately
+negative in PC2 (up-down direction).</p>
+<p><img src="/images/2/biplot_lego.png" /></p>
+<p>The biplot highlights the direction of the features in PC1 and 2.</p>
+<h4 id="summary">Summary</h4>
+<p>Because the original data is not high-dimensional, PCA was mostly
+used to find latent connections within the features. Based on the
+loadings, it appeared to isolate high-quality listings and high-quality
+sellers (for eBay data) as well as the (negatively correlated)
+relationship between discount and recent sales in the case of Amazon
+data. These are interesting connections that will be used in future
+analysis.</p>
