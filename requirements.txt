@@ -1,0 +1,7 @@
+# create a virtual environment and run pip install -r requirements.txt
+# then deactivate before going back to the notebook file
+
+numpy==2.1.1
+pandas
+scikit-learn
+k-means-constrained

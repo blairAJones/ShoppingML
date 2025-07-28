@@ -1,4 +1,4 @@
-#run this in kmc-env virtual environment to avoid issues with base kernel crashing
+#run this in a virtual environment (after running requirements.txt) to avoid issues with base kernel crashing
 
 import numpy as np
 import pandas as pd
