@@ -1,0 +1,97 @@
+### Overview
+Decision trees are a machine learning technique that create flowchart structures based on data splits.  In order to decide how to best split the data, metrics like Gini impurity and entropy are used. Gini impurity measures node purity (are leaf nodes composed of a single class?), with a 0 value meaning a pure node and a 0.5 value meaning there is an even split between 2 classes.  Entropy measures node disorder, with an evenly split node equaling 1.  
+
+Let $p_i$ be the probability of class i:
+Gini Impurity: $1 - \sum_i p_i^2$
+
+Entropy: $-\sum_i p_i \text{log}_2 (p_i)$
+
+Feature importance is an important metric in tree-based models and represents the decrease in node impurity based on specific features.
+
+Random Forests are a subset of a decision tree model that creates many trees during training, uses bootstrap sampling and chooses a random subset of features to train on, which reduces impacts of correlated features and can reduce overfitting by averaging many trees.  
+
+Decision tree models can handle both numerical and (encoded) categorical features.  There is not a distance measurement like in other models which only respond well to true continuous features.   
+
+### Data
+Classification responses were added to the data sets to test if the decision tree could accurately identify price buckets of "high", "medium" and "low".  Because prices are not normally distributed, using a clustering technique (like seen here...) to assign these buckets was considered, rather than a simple quantile split.  
+
+First, a simple K-means clustering was attempted on the microwaves data; however, the buckets ended up extremely unbalanced (108 items in the "low" bucket, while the medium and high buckets each had only 8 items).  Other options were explored, and eventually the K-Means Constrained technique was used.  This technique uses K-Means but allows the user to put constraints on bucket size, to ensure a more even spread.  In addition to the assignment of pricing tiers, a simple "is_high_price" boolean variable was added, based on the median price.  Either the pricing tier or is_high_price would then be the response variable to be classified.
+
+![](images/3/kmc_summary.png)
+
+Because decision trees can handle both numerical and (encoded) categorical data, all features were considering in training.  Categorical features like club name or Lego theme needed to be encoded as binary to work with these models.  
+
+
+### Code
+The decision tree and random forest code is found here.
+
+### Results
+For all data sets, a simple decision tree classifier was created first.  Then a random forest model was built using hyperparameter tuning and cross validation.  A grid of parameters was chosen, including max depth, minimum leaf size, and number of trees, and the "best" parameters based on training accuracy were then used on the test set.  
+
+As with the Naive Bayes / KNN analysis, training and testing splits were created so metrics comparisons can be made on unseen data.
+
+
+#### iPhones
+
+<div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+  <img src="images/3/cm_iphone.png" alt="Image 1" width="300">
+  <img src="images/3/cm_rf_iphone.png" alt="Image 2" width="300">
+</div>
+
+![](images/3/fi_iphone_top10.png)
+
+Model number, days listed and title length had over 10% of feature importance. 
+
+A partial dependence plot was generated based on days listed and title length.
+
+![](images/3/pdp_iphone.png)
+
+#### Soccer Jerseys
+
+<div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+  <img src="images/3/cm_soccer.png" alt="Image 1" width="300">
+  <img src="images/3/cm_rf_soccer.png" alt="Image 2" width="300">
+</div>
+
+![](images/3/fi_soccer_top10.png)
+
+No individual feature represented over 10% of feature importance.  
+
+#### Microwaves
+
+<div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+  <img src="images/3/cm_microwave.png" alt="Image 1" width="300">
+  <img src="images/3/cm_rf_microwave.png" alt="Image 2" width="300">
+</div>
+
+![](images/3/fi_microwave.png)
+
+Cubic feet was overwhelmingly the most important feature, representing nearly 40%.  
+
+#### Lego
+
+<div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+  <img src="images/3/cm_lego.png" alt="Image 1" width="300">
+  <img src="images/3/cm_rf_lego.png" alt="Image 2" width="300">
+</div>
+
+![](images/3/fi_lego_top10.png)
+
+Four features had over 10% in importance, with top feature ratings total representing over 20%. 
+
+Partial dependence plot:
+
+![](images/3/pdp_lego.png)
+
+Because the Random Forest model with the three classes did not show much of an improvement in the simple decision tree model, another RF model based on two classes was created.
+
+![](images/3/cm_rf_lego2.png)
+
+The two class model showed a significant improvement in accuracy.  Since it's a simple true/false "high price" classification, the mis-classed items may want to be investigated for potential overpricing/underpricing.
+
+![](images/3/lego_price_disc.png)
+
+
+
+### Summary
+As expected, given the combination of both numerical and categorical (and binary) variables, tree-based models performed fairly well on the classification of this data. Depending on 
