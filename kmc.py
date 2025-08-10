@@ -23,8 +23,24 @@ def fit_kmc(df, column='price_value', n_clusters=3, min_frac=0.25, max_frac=0.50
     return df
 
 
-
 df_iphone = pd.read_csv("data/iphone_new.csv")
+
+import re
+def extract_storage(title):
+    # Match numbers followed by optional space and GB or TB (case-insensitive)
+    pattern = re.compile(r'(\d+\s*(?:GB|TB))', re.IGNORECASE)
+    matches = pattern.findall(title)
+    if matches:
+        # Standardize by removing spaces and uppercasing unit (e.g., "1 tb" -> "1TB")
+        storage = matches[0].replace(" ", "").upper()
+        return storage
+    else:
+        return "Unknown"
+
+df_iphone['storage'] = df_iphone['title'].apply(extract_storage)
+df_iphone['storage'] = df_iphone['storage'].replace({'6GB': '128GB'})
+df_iphone["model_variant"] = df_iphone["title"].str.extract(r'\b(Pro Max|Pro|Plus)\b', flags=re.IGNORECASE).fillna("none")
+
 df_iphone = fit_kmc(df_iphone, column='price.value')
 df_iphone.to_csv("data/iphone_kmc.csv", index=False)
 
